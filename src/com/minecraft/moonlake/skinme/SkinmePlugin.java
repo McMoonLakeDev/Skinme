@@ -1,10 +1,13 @@
 package com.minecraft.moonlake.skinme;
 
+import com.minecraft.moonlake.exception.player.PlayerNotOnlineException;
 import com.minecraft.moonlake.skinme.api.Skinme;
-import com.minecraft.moonlake.skinme.data.UserProfile;
-import com.minecraft.moonlake.skinme.data.UserSkinProfile;
-import com.minecraft.moonlake.skinme.data.skin.SkinProperty;
-import com.minecraft.moonlake.skinme.manager.NetManager;
+import com.minecraft.moonlake.skinme.commands.Commandmlskinme;
+import com.minecraft.moonlake.skinme.exception.IllegalMojangSkinmeException;
+import com.minecraft.moonlake.skinme.exception.IllegalMojangUserException;
+import com.minecraft.moonlake.skinme.manager.SkinmeManager;
+import com.minecraft.moonlake.util.Util;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -12,47 +15,74 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class SkinmePlugin extends JavaPlugin implements Skinme {
 
+    private final ConsoleCommandSender console;
+    private static Skinme MAIN;
+
+    public SkinmePlugin() {
+
+        this.console = this.getServer().getConsoleSender();
+    }
+
     @Override
     public void onEnable() {
 
-        String target = "jeb_";
+        MAIN = this;
 
-        UserProfile profile = NetManager.getUserProfile(target);
+        this.getCommand("mlskinme").setExecutor(new Commandmlskinme(this));
 
-        if(profile != null) {
-
-            System.out.println("[MoonLakeSkinme] 玩家 " + target + " 为正版玩家，其 UUID 为: " + profile.getId());
-            System.out.println("[MoonLakeSkinme] 正在尝试获取此玩家的皮肤信息数据...");
-
-            UserSkinProfile skinProfile = NetManager.getUserSkinProfile(profile);
-
-            if(skinProfile != null) {
-
-                System.out.println("[MoonLakeSkinme] 成功获取到此玩家的正版皮肤信息数据.");
-
-                SkinProperty property = skinProfile.getFirstSkinProfile().getValueToSkinProperty();
-
-                if(property != null) {
-
-                    System.out.println("[MoonLakeSkinme] 其皮肤模型类型为: " + property.getModel());
-                    System.out.println("[MoonLakeSkinme] 其皮肤模型类型是否为 Alex: " + property.isAlexModel());
-                    System.out.println("[MoonLakeSkinme] 其皮肤材质指向的链接 URL 为: " + property.getSkinUrl());
-
-                    boolean hasCape = property.hasCape();
-
-                    System.out.println("[MoonLakeSkinme] 其皮肤属性是否拥有披风材质: " + hasCape);
-
-                    if(hasCape) {
-
-                        System.out.println("[MoonLakeSkinme] 其皮肤的披风材质指向的链接 URL 为: " + property.getCapeUrl());
-                    }
-                }
-            }
-        }
+        this.log("月色之湖皮肤 MoonLakeSkinme 插件 v" + getDescription().getVersion() + " 成功加载.");
     }
 
     @Override
     public void onDisable() {
 
+    }
+
+    /**
+     * 获取插件的主类对象
+     *
+     * @return 主类
+     */
+    @Override
+    public SkinmePlugin getMain() {
+
+        return this;
+    }
+
+    /**
+     * 给控制台输出日志信息
+     *
+     * @param message 日志
+     */
+    @Override
+    public void log(String message) {
+
+        this.console.sendMessage("[MoonLakeSkinme] " + Util.color(message));
+    }
+
+    /**
+     * 设置指定玩家的皮肤为目标玩家
+     *
+     * @param source 源玩家
+     * @param target 目标玩家
+     * @throws com.minecraft.moonlake.exception.player.PlayerNotOnlineException 如果源玩家没有在线则抛出异常
+     * @throws com.minecraft.moonlake.skinme.exception.IllegalMojangUserException 如果目标玩家不是正版用户则抛出异常
+     * @throws com.minecraft.moonlake.skinme.exception.IllegalMojangSkinmeException 如果目标玩家没有皮肤数据则抛出异常
+     */
+    public void setSkinme(String source, String target) throws PlayerNotOnlineException, IllegalMojangUserException, IllegalMojangSkinmeException {
+
+        SkinmeManager.setSkinme(source, target);
+    }
+
+    /**
+     * 清除指定玩家的皮肤数据
+     *
+     * @param source 源玩家
+     * @throws PlayerNotOnlineException 如果源玩家没有在线则抛出异常
+     */
+    @Override
+    public void clearSkinme(String source) throws PlayerNotOnlineException {
+
+        SkinmeManager.clearSkinme(source);
     }
 }

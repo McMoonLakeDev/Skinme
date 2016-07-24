@@ -4,3 +4,7 @@ version: 1.0
 author: Month_Light
 website: http://www.mcyszh.net
 depend: [MoonLake]
+commands:
+  mlskinme:
+    descrption: 月色之湖皮肤插件命令管理
+    usage: /<command> help

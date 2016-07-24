@@ -86,7 +86,7 @@ public final class NetManager {
     }
 
     /**
-     * 获取指定玩家名的 Mojang 账户 Skin Profile 信息对象
+     * 获取指定玩家的 Mojang 账户 Skin Profile 信息对象
      *
      * @param uuid 玩家 UUID
      * @return 用户皮肤信息对象 异常或没有返回 null
@@ -97,7 +97,7 @@ public final class NetManager {
 
         try {
 
-            httpURLConnection = getConnection(USER_PROFILE_SKIN_URL + uuid.replace("-", ""));
+            httpURLConnection = getConnection(USER_PROFILE_SKIN_URL + uuid.replace("-", "") + "?unsigned=false");
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Content-Type", "application/json");
             httpURLConnection.setRequestProperty("User-Agent", "Premium-Checker");

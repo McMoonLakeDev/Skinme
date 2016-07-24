@@ -2,6 +2,7 @@ package com.minecraft.moonlake.skinme.data;
 
 import com.google.gson.Gson;
 import com.minecraft.moonlake.skinme.data.skin.SkinProperty;
+import com.mojang.authlib.properties.Property;
 
 import java.util.Base64;
 
@@ -85,5 +86,15 @@ public class UserSkinProperty {
     public UserSkinProperty clone() {
 
         return new UserSkinProperty(name, value, signature);
+    }
+
+    /**
+     * 将此用户的皮肤属性对象转换为 Mojang 皮肤属性对象
+     *
+     * @return Mojang 的皮肤属性对象
+     */
+    public Property toMojangProperty() {
+
+        return new Property(name, value, signature);
     }
 }
