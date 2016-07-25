@@ -1,7 +1,7 @@
 package com.minecraft.moonlake.skinme.commands;
 
 import com.minecraft.moonlake.skinme.api.Skinme;
-import com.minecraft.moonlake.skinme.manager.SkinmeManager;
+import com.minecraft.moonlake.skinme.manager.SkinManager;
 import com.minecraft.moonlake.util.Util;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,7 +35,7 @@ public class Commandmlskinme implements CommandExecutor {
 
             if(args[0].equalsIgnoreCase("set")) {
 
-                SkinmeManager.setSkinme(args[1], args[2]);
+                SkinManager.setSkinme(args[1], args[2]);
 
                 sender.sendMessage(Util.color("Skinme set to " + args[2] + " debug test."));
             }

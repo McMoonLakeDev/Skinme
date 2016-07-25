@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 /**
  * Created by MoonLake on 2016/7/24.
  */
-public final class SkinmeManager {
+public final class SkinManager {
 
     /**
      * 设置指定玩家的皮肤为目标玩家
@@ -27,6 +27,7 @@ public final class SkinmeManager {
      * @throws com.minecraft.moonlake.skinme.exception.IllegalMojangUserException 如果目标玩家不是正版用户则抛出异常
      * @throws com.minecraft.moonlake.skinme.exception.IllegalMojangSkinmeException 如果目标玩家没有皮肤数据则抛出异常
      */
+    @Deprecated
     public static void setSkinme(String source, String target) throws PlayerNotOnlineException, IllegalMojangUserException, IllegalMojangSkinmeException {
 
         Player player = PlayerManager.fromName(source);
@@ -47,14 +48,71 @@ public final class SkinmeManager {
 
             throw new IllegalMojangSkinmeException();
         }
+        setSkinme(player, targetSkinProfile);
+    }
+
+    /**
+     * 设置指定玩家的皮肤为目标玩家
+     *
+     * @param source 源玩家
+     * @param targetSkinProfile 目标用户皮肤信息对象
+     * @throws com.minecraft.moonlake.exception.player.PlayerNotOnlineException 如果源玩家没有在线则抛出异常
+     */
+    @Deprecated
+    public static void setSkinme(Player source, UserSkinProfile targetSkinProfile) throws PlayerNotOnlineException {
+
+        if(source == null || !source.isOnline()) {
+
+            throw new PlayerNotOnlineException();
+        }
         UserSkinProperty targetSkinProperty = targetSkinProfile.getFirstSkinProfile();
         Property targetProperty = targetSkinProperty.toMojangProperty();
-        GameProfile sourceGameProfile = PlayerManager.getProfile(player);
+        GameProfile sourceGameProfile = PlayerManager.getProfile(source);
 
         sourceGameProfile.getProperties().get("textures").clear();
         sourceGameProfile.getProperties().put(targetProperty.getName(), targetProperty);
 
-        updateSkinme(player, sourceGameProfile);
+        updateSkinme(source, sourceGameProfile);
+    }
+
+    /**
+     * 设置指定玩家的皮肤为目标玩家 (异步不影响主线程)
+     *
+     * @param source 源玩家
+     * @param target 目标玩家
+     * @throws PlayerNotOnlineException     如果源玩家没有在线则抛出异常
+     * @throws IllegalMojangUserException   如果目标玩家不是正版用户则抛出异常
+     * @throws IllegalMojangSkinmeException 如果目标玩家没有皮肤数据则抛出异常
+     */
+    public static void setSkinmeAsync(final String source, final String target) throws PlayerNotOnlineException, IllegalMojangUserException, IllegalMojangSkinmeException {
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                setSkinme(source, target);
+            }
+        }).start();
+    }
+
+    /**
+     * 设置指定玩家的皮肤为目标玩家 (异步不影响主线程)
+     *
+     * @param source            源玩家
+     * @param targetSkinProfile 目标用户皮肤信息对象
+     * @throws PlayerNotOnlineException 如果源玩家没有在线则抛出异常
+     */
+    public static void setSkinmeAsync(final Player source, final UserSkinProfile targetSkinProfile) throws PlayerNotOnlineException {
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                setSkinme(source, targetSkinProfile);
+            }
+        }).start();
     }
 
     /**
